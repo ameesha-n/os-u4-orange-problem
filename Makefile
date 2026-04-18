@@ -1,28 +1,26 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -O2
-LDFLAGS = -lcrypto
+CFLAGS = -Wall -Wextra -O2 -I/opt/homebrew/opt/openssl@3/include
+LDFLAGS = -L/opt/homebrew/opt/openssl@3/lib -lcrypto
 
-# ─── Main binary ─────────────────────────────────────────────────────────────
-
-SRCS = object.c tree.c index.c commit.c pes.c
+# ─── Source files ─────────────────────────────────────────────
+SRCS = pes.c object.c tree.c index.c commit.c
 OBJS = $(SRCS:.c=.o)
 
+# ─── Main binary ─────────────────────────────────────────────
 pes: $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c pes.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# ─── Test binaries ───────────────────────────────────────────────────────────
-
+# ─── Test binaries ───────────────────────────────────────────
 test_objects: test_objects.o object.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 test_tree: test_tree.o object.o tree.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-# ─── Convenience targets ────────────────────────────────────────────────────
-
+# ─── Convenience targets ────────────────────────────────────
 .PHONY: all clean test test-unit test-integration
 
 all: pes test_objects test_tree
